@@ -69,6 +69,9 @@ IF (NOT WIN32)
   IF (NOT OPENTHREADS_LIBRARY_DEBUG)
     SET(OPENTHREADS_LIBRARY_DEBUG ${OPENTHREADS_LIBRARY})
   ENDIF()
+  IF (NOT OSGSHADOW_LIBRARY_DEBUG)
+    SET(OSGSHADOW_LIBRARY_DEBUG ${OSGSHADOW_LIBRARY})
+  ENDIF()
 ENDIF()
 
 find_package (OpenGL REQUIRED)
@@ -83,17 +86,17 @@ OPTION(USE_FFTSS "Use FFTSS (LGPL) as FFT library." ON)                         
 # single-selection list in CMake? Right now it will just use the first one
 # that is checked in the order below.
 
-IF(USE_FFTSS)
-  find_package (fftss REQUIRED)
-  MESSAGE(STATUS "Using FFTSS (LGPL) as FFT library.")
-
-  ADD_DEFINITIONS(-DUSE_FFTSS)
-  SET( FFT_INCLUDE_DIR ${FFTSS_INCLUDE_DIR} )
-  SET( FFT_LIBRARY ${FFTSS_LIBRARY} )
-
-  SET(USE_FFTW3 FALSE)
-  SET(USE_FFTW3F FALSE)
-ELSEIF(USE_FFTW3F)
+#IF(USE_FFTSS)
+#  find_package (fftss REQUIRED)
+#  MESSAGE(STATUS "Using FFTSS (LGPL) as FFT library.")
+#
+#  ADD_DEFINITIONS(-DUSE_FFTSS)
+#  SET( FFT_INCLUDE_DIR ${FFTSS_INCLUDE_DIR} )
+#  SET( FFT_LIBRARY ${FFTSS_LIBRARY} )
+#
+#  SET(USE_FFTW3 FALSE)
+#  SET(USE_FFTW3F FALSE)
+#ELSEIF(USE_FFTW3F)
   find_package (fftw3f-3 REQUIRED)
   MESSAGE(STATUS "Using FFTW3F (single-precision) (GPL) as FFT library.")
 
@@ -103,20 +106,20 @@ ELSEIF(USE_FFTW3F)
 
   SET(USE_FFTW3 FALSE)
   SET(USE_FFTSS FALSE)
-ELSEIF(USE_FFTW3)
-  find_package (fftw3-3 REQUIRED)
-  MESSAGE(STATUS "Using FFTW3 (double-precision) (GPL) as FFT library.")
-
-  ADD_DEFINITIONS(-DUSE_FFTW3)
-  SET( FFT_INCLUDE_DIR ${FFTW3-3_INCLUDE_DIR} )
-  SET( FFT_LIBRARY ${FFTW3-3_LIBRARY} )
-
-  SET(USE_FFTW3F FALSE)
-  SET(USE_FFTSS FALSE)
-ELSE()
-  # Error if none of the three is selected.
-  MESSAGE("No FFT library selected, you will not be able to generate ocean surfaces.")
-ENDIF()
+#ELSEIF(USE_FFTW3)
+#  find_package (fftw3-3 REQUIRED)
+#  MESSAGE(STATUS "Using FFTW3 (double-precision) (GPL) as FFT library.")
+#
+#  ADD_DEFINITIONS(-DUSE_FFTW3)
+#  SET( FFT_INCLUDE_DIR ${FFTW3-3_INCLUDE_DIR} )
+#  SET( FFT_LIBRARY ${FFTW3-3_LIBRARY} )
+#
+#  SET(USE_FFTW3F FALSE)
+#  SET(USE_FFTSS FALSE)
+#ELSE()
+#  # Error if none of the three is selected.
+#  MESSAGE("No FFT library selected, you will not be able to generate ocean surfaces.")
+#ENDIF()
 
 
 IF (WIN32)
