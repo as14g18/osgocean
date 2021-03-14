@@ -297,11 +297,12 @@ int main(int argc, char *argv[])
 
         scene->getOceanScene()->addChild(loadedModel.get());
     }
-
+    
+    osg::ref_ptr<osg::MatrixTransform> boatTransform;
     if (testCollision)
     {
         osgDB::Registry::instance()->getDataFilePathList().push_back("resources/boat");
-        const std::string filename = "boat.3ds";
+        const std::string filename = "/home/akhi/Downloads/boat.3ds";
         osg::ref_ptr<osg::Node> boat = osgDB::readNodeFile(filename);
 
         if(boat.valid())
@@ -311,9 +312,9 @@ int main(int argc, char *argv[])
                                scene->getOceanScene()->getRefractedSceneMask() |
                                CAST_SHADOW | RECEIVE_SHADOW );
 
-            osg::ref_ptr<osg::MatrixTransform> boatTransform = new osg::MatrixTransform;
+            boatTransform = new osg::MatrixTransform;
             boatTransform->addChild(boat.get());
-            boatTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(0.0f, 160.0f,0.0f)));
+            boatTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(50.0f, 160.0f, 0.0f)));
             boatTransform->setUpdateCallback( new BoatPositionCallback(scene->getOceanScene()) );
 
             scene->getOceanScene()->addChild(boatTransform.get());   
@@ -419,9 +420,12 @@ int main(int argc, char *argv[])
     view->getCamera()->setName("MainCamera");
 
     viewer->realize();
-
+    
+    float y = 160.0f;
     while(!viewer->done())
     {
+    	boatTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(0.0f, y, 0.0f)));
+    	y-=0.1;
         viewer->frame();    
     }
 
