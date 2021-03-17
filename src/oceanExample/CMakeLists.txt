@@ -61,6 +61,7 @@ ADD_EXECUTABLE(
   Scene.cpp
   SkyDome.cpp
   SphereSegment.cpp
+  Api.cpp
   
 
   ${HEADER_PATH}/SceneEventHandler.h
@@ -69,6 +70,7 @@ ADD_EXECUTABLE(
   ${HEADER_PATH}/SkyDome.h
   ${HEADER_PATH}/SphereSegment.h
   ${HEADER_PATH}/TextHUD.h
+  ${HEADER_PATH}/Api.h
 
   ${EXAMPLE_SHADERS}
 )

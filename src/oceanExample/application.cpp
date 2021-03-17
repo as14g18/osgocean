@@ -34,6 +34,8 @@
 #include <osgGA/StateSetManipulator>
 
 #include <osg/Notify>
+#include <osg/Geode>
+#include <osg/ShapeDrawable>
 
 #include <osgDB/ReadFile>
 
@@ -47,6 +49,7 @@
 #include "SceneEventHandler.h"
 #include "Scene.h"
 #include "TextHUD.h"
+#include "Api.h"
 
 class BoatPositionCallback : public osg::NodeCallback
 {
@@ -304,33 +307,10 @@ int main(int argc, char *argv[])
 
         scene->getOceanScene()->addChild(loadedModel.get());
     }
-    
-    osg::ref_ptr<osg::MatrixTransform> boatTransform;
-    if (testCollision)
-    {
-        osgDB::Registry::instance()->getDataFilePathList().push_back("resources/boat");
-        const std::string filename = "/home/akhi/Downloads/boat.3ds";
-        osg::ref_ptr<osg::Node> boat = osgDB::readNodeFile(filename);
 
-        if(boat.valid())
-        {
-            boat->setNodeMask( scene->getOceanScene()->getNormalSceneMask()    | 
-                               scene->getOceanScene()->getReflectedSceneMask() | 
-                               scene->getOceanScene()->getRefractedSceneMask() |
-                               CAST_SHADOW | RECEIVE_SHADOW );
-
-            boatTransform = new osg::MatrixTransform;
-            boatTransform->addChild(boat.get());
-            boatTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(50.0f, 160.0f, 0.0f)));
-            boatTransform->setUpdateCallback( new BoatPositionCallback(scene->getOceanScene()) );
-
-            scene->getOceanScene()->addChild(boatTransform.get());   
-        }
-        else
-        {
-            osg::notify(osg::WARN) << "testCollision flag ignored - Could not find: " << filename << std::endl;
-        }
-    }
+    Api api;
+    api.parse("CREATE 1 2 3", scene);
+    // Api::addCylinder(scene);
 
     //------------------------------------------------------------------------
     // Set up the viewer
@@ -430,16 +410,10 @@ int main(int argc, char *argv[])
     
     float y = 160.0f;
 
-    int fd = open("../../../renderer_fifo", O_RDONLY);
-
-    int api_str_len = 4;
-    char api_str[200];
-    // read(fd, &api_str_len, sizeof(int));
-    // printf("Received: %d\n", api_str_len);
-    read(fd, api_str, sizeof(char) * api_str_len);
-    printf("Received: %s\n", api_str);
-
-    close(fd);
+    // int fd = open("/home/akhi/Documents/p3project/ASVLite/renderer_fifo", O_RDONLY);
+    // if (fd == -1) {
+    //     return 5;
+    // }    
 
     while(!viewer->done())
     {
@@ -447,8 +421,15 @@ int main(int argc, char *argv[])
     	y-=0.1;
         viewer->frame();
 
-        
+        // int api_str_len;
+        // char api_str[200];
+        // read(fd, &api_str_len, sizeof(int));
+        // printf("Received: %d\n", api_str_len);
+        // read(fd, api_str, sizeof(char) * api_str_len);
+        // printf("Received: %s\n", api_str);
     }
+
+    // close(fd);
 
     return 0;
 }
