@@ -19,6 +19,13 @@
 #include <vector>
 #include <iostream>
 
+// For piping
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <fcntl.h>
+
 #include <osgViewer/Viewer>
 #include <osgViewer/CompositeViewer>
 
@@ -422,11 +429,25 @@ int main(int argc, char *argv[])
     viewer->realize();
     
     float y = 160.0f;
+
+    int fd = open("../../../renderer_fifo", O_RDONLY);
+
+    int api_str_len = 4;
+    char api_str[200];
+    // read(fd, &api_str_len, sizeof(int));
+    // printf("Received: %d\n", api_str_len);
+    read(fd, api_str, sizeof(char) * api_str_len);
+    printf("Received: %s\n", api_str);
+
+    close(fd);
+
     while(!viewer->done())
     {
-    	boatTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(0.0f, y, 0.0f)));
+    	// boatTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(0.0f, y, 0.0f)));
     	y-=0.1;
-        viewer->frame();    
+        viewer->frame();
+
+        
     }
 
     return 0;
