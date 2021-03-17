@@ -410,7 +410,6 @@ int main(int argc, char *argv[])
     }
 
     Api api;
-    api.parse("CREATE 1 1 2 3", scene);
 
     while(!viewer->done())
     {

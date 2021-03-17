@@ -36,9 +36,9 @@
 #include "Api.h"
 
 #define X_OFFSET 0.0f
-#define Y_OFFSET 100.0f
-#define Z_OFFSET 5.0f
-#define SPEED 1.0f
+#define Y_OFFSET 150.0f
+#define Z_OFFSET 0.0f
+#define SPEED 50.0f
 
 osg::ref_ptr<osg::MatrixTransform> addCylinder(osg::ref_ptr<Scene> &scene, int width, int height, int length)
 {
@@ -67,10 +67,11 @@ osg::ref_ptr<osg::MatrixTransform> addCylinder(osg::ref_ptr<Scene> &scene, int w
 void moveCylinder(osg::ref_ptr<osg::MatrixTransform> &boatTransform, float x, float y, float z)
 {
 	boatTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(
-		(x+X_OFFSET)*SPEED,
-		(y+Y_OFFSET)*SPEED,
-		(z+Z_OFFSET)*SPEED
+		(x*SPEED)+X_OFFSET,
+		(y*SPEED)+Y_OFFSET,
+		z+Z_OFFSET
 	)));
+	std::cout << (x*SPEED)+X_OFFSET << " " << (y*SPEED)+Y_OFFSET << " " << z+Z_OFFSET << "\n";
 }
 
 void Api::parse(std::string str, osg::ref_ptr<Scene> &scene) {
@@ -82,13 +83,13 @@ void Api::parse(std::string str, osg::ref_ptr<Scene> &scene) {
 	}
 
 	if (tokens[0] == "CREATE") {
-		asvList[std::stoi(tokens[1])] = addCylinder(scene, std::stoi(tokens[2]), std::stoi(tokens[3]), std::stoi(tokens[4]));
+		asvList[std::stod(tokens[1])] = addCylinder(scene, std::stod(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4]));
 	} else if (tokens[0] == "MOVE") {
 		moveCylinder(
-			asvList[std::stoi(tokens[1])],
-			std::stoi(tokens[2]),
-			std::stoi(tokens[3]),
-			std::stoi(tokens[4])
+			asvList[std::stod(tokens[1])],
+			std::stod(tokens[2]),
+			std::stod(tokens[3]),
+			std::stod(tokens[4])
 		);
 	}
 }
