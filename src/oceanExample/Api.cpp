@@ -63,6 +63,11 @@ osg::ref_ptr<osg::MatrixTransform> addCylinder(osg::ref_ptr<Scene> &scene, int w
     return boatTransform;
 }
 
+void moveCylinder(osg::ref_ptr<osg::MatrixTransform> &boatTransform, float x, float y, float z)
+{
+	boatTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(x+X_OFFSET, y+Y_OFFSET, z+Z_OFFSET)));
+}
+
 void Api::parse(std::string str, osg::ref_ptr<Scene> &scene) {
 	std::vector<std::string> tokens;
 	std::istringstream ss(str);
@@ -72,6 +77,13 @@ void Api::parse(std::string str, osg::ref_ptr<Scene> &scene) {
 	}
 
 	if (tokens[0] == "CREATE") {
-		asvList[0] = addCylinder(scene, std::stoi(tokens[1]), std::stoi(tokens[2]), std::stoi(tokens[3]));
+		asvList[std::stoi(tokens[1])] = addCylinder(scene, std::stoi(tokens[2]), std::stoi(tokens[3]), std::stoi(tokens[4]));
+	} else if (tokens[0] == "MOVE") {
+		moveCylinder(
+			asvList[std::stoi(tokens[1])],
+			std::stoi(tokens[2]),
+			std::stoi(tokens[3]),
+			std::stoi(tokens[4])
+		);
 	}
 }

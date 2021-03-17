@@ -309,8 +309,8 @@ int main(int argc, char *argv[])
     }
 
     Api api;
-    api.parse("CREATE 1 2 3", scene);
-    // Api::addCylinder(scene);
+    api.parse("CREATE 1 1 2 3", scene);
+    api.parse("MOVE 1 100 50 0", scene);
 
     //------------------------------------------------------------------------
     // Set up the viewer
