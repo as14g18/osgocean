@@ -38,6 +38,7 @@
 #define X_OFFSET 0.0f
 #define Y_OFFSET 100.0f
 #define Z_OFFSET 5.0f
+#define SPEED 1.0f
 
 osg::ref_ptr<osg::MatrixTransform> addCylinder(osg::ref_ptr<Scene> &scene, int width, int height, int length)
 {
@@ -65,7 +66,11 @@ osg::ref_ptr<osg::MatrixTransform> addCylinder(osg::ref_ptr<Scene> &scene, int w
 
 void moveCylinder(osg::ref_ptr<osg::MatrixTransform> &boatTransform, float x, float y, float z)
 {
-	boatTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(x+X_OFFSET, y+Y_OFFSET, z+Z_OFFSET)));
+	boatTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(
+		(x+X_OFFSET)*SPEED,
+		(y+Y_OFFSET)*SPEED,
+		(z+Z_OFFSET)*SPEED
+	)));
 }
 
 void Api::parse(std::string str, osg::ref_ptr<Scene> &scene) {

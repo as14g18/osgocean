@@ -308,10 +308,6 @@ int main(int argc, char *argv[])
         scene->getOceanScene()->addChild(loadedModel.get());
     }
 
-    Api api;
-    api.parse("CREATE 1 1 2 3", scene);
-    api.parse("MOVE 1 100 50 0", scene);
-
     //------------------------------------------------------------------------
     // Set up the viewer
     //------------------------------------------------------------------------
@@ -408,28 +404,29 @@ int main(int argc, char *argv[])
 
     viewer->realize();
     
-    float y = 160.0f;
+    int fd = open("/home/akhi/Documents/p3project/ASVLite/renderer_fifo", O_RDONLY);
+    if (fd == -1) {
+        return 5;
+    }
 
-    // int fd = open("/home/akhi/Documents/p3project/ASVLite/renderer_fifo", O_RDONLY);
-    // if (fd == -1) {
-    //     return 5;
-    // }    
+    Api api;
+    api.parse("CREATE 1 1 2 3", scene);
 
     while(!viewer->done())
     {
-    	// boatTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(0.0f, y, 0.0f)));
-    	y-=0.1;
         viewer->frame();
 
-        // int api_str_len;
-        // char api_str[200];
-        // read(fd, &api_str_len, sizeof(int));
+        // Read new action from API pipe
+        int api_str_len;
+        char api_str[200];
+        read(fd, &api_str_len, sizeof(int));
         // printf("Received: %d\n", api_str_len);
-        // read(fd, api_str, sizeof(char) * api_str_len);
+        read(fd, api_str, sizeof(char) * api_str_len);
         // printf("Received: %s\n", api_str);
+        api.parse(std::string(api_str), scene);
     }
 
-    // close(fd);
+    close(fd);
 
     return 0;
 }
