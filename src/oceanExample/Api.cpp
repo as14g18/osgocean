@@ -86,16 +86,42 @@ void moveASV(osg::ref_ptr<osg::PositionAttitudeTransform> &boatTransform, float 
 	);
 
 	boatTransform->setAttitude(quat);
-	// osg::Matrix mat = osg::Matrix::translate(osg::Vec3f(
-	// 	(x*SPEED)+X_OFFSET,
-	// 	(y*SPEED)+Y_OFFSET,
-	// 	z+Z_OFFSET
-	// ));
+}
 
-	// const double angle = 90;
-	// const osg::Vec3d axis(x, y, z);
-	// boatTransform->setMatrix(mat * osg::Matrix::rotate(angle, axis));
-	// // std::cout << (x*SPEED)+X_OFFSET << " " << (y*SPEED)+Y_OFFSET << " " << z+Z_OFFSET << "\n";
+void addBound(osg::ref_ptr<Scene> &scene, float x, float y, float xlen, float ylen, float zlen)
+{
+	osg::ref_ptr<osg::CompositeShape> shape = new osg::CompositeShape;
+	osg::ref_ptr<osg::Box> box1 = new osg::Box(
+    	osg::Vec3f(X_OFFSET+x, Y_OFFSET+0.5*ylen+y, Z_OFFSET),
+    	xlen, 1.0f, zlen
+    );
+
+    osg::ref_ptr<osg::Box> box2 = new osg::Box(
+    	osg::Vec3f(X_OFFSET+x, Y_OFFSET-0.5*ylen+y, Z_OFFSET),
+    	xlen, 1.0f, zlen
+    );
+
+    osg::ref_ptr<osg::Box> box3 = new osg::Box(
+    	osg::Vec3f(X_OFFSET+0.5*xlen+x, Y_OFFSET+y, Z_OFFSET),
+    	1.0f, ylen, zlen
+    );
+
+    osg::ref_ptr<osg::Box> box4 = new osg::Box(
+    	osg::Vec3f(X_OFFSET-0.5*xlen+x, Y_OFFSET+y, Z_OFFSET),
+    	1.0f, ylen, zlen
+    );
+
+	shape->addChild(box1);
+	shape->addChild(box2);
+	shape->addChild(box3);
+	shape->addChild(box4);
+
+	osg::ref_ptr<osg::Geode> bound = new osg::Geode;
+	osg::ref_ptr<osg::ShapeDrawable> drawable = new osg::ShapeDrawable(shape);
+
+	bound->addDrawable(drawable);	
+
+    scene->getOceanScene()->addChild(bound);
 }
 
 void Api::parse(std::string str, osg::ref_ptr<Scene> &scene) {
@@ -105,7 +131,6 @@ void Api::parse(std::string str, osg::ref_ptr<Scene> &scene) {
 	while (ss >> token) {
 		tokens.push_back(token);
 	}
-
 	if (tokens[0] == "CREATE") {
 		asvList[std::stod(tokens[1])] = addASV(scene, std::stod(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4]));
 	} else if (tokens[0] == "MOVE") {
@@ -117,6 +142,15 @@ void Api::parse(std::string str, osg::ref_ptr<Scene> &scene) {
 			std::stod(tokens[5]),
 			std::stod(tokens[6]),
 			std::stod(tokens[7])
+		);
+	} else if (tokens[0] == "BOUND") {
+		addBound(
+			scene,
+			std::stod(tokens[1]),
+			std::stod(tokens[2]),
+			std::stod(tokens[3]),
+			std::stod(tokens[4]),
+			std::stod(tokens[5])
 		);
 	}
 }
