@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <unordered_map>
+#include <math.h>
 
 // For piping
 #include <unistd.h>
@@ -40,9 +41,9 @@
 #define Z_OFFSET 0.0f
 #define SPEED 50.0f
 
-osg::ref_ptr<osg::MatrixTransform> addCylinder(osg::ref_ptr<Scene> &scene, int width, int height, int length)
+osg::ref_ptr<osg::PositionAttitudeTransform> addASV(osg::ref_ptr<Scene> &scene, int width, int height, int length)
 {
-	osg::ref_ptr<osg::MatrixTransform> boatTransform;
+	osg::ref_ptr<osg::PositionAttitudeTransform> boatTransform;
 
 	osg::ref_ptr<osg::Geode> boat = new osg::Geode;
     boat->addDrawable(new osg::ShapeDrawable(new osg::Cylinder(
@@ -56,7 +57,7 @@ osg::ref_ptr<osg::MatrixTransform> addCylinder(osg::ref_ptr<Scene> &scene, int w
                        scene->getOceanScene()->getRefractedSceneMask() |
                        CAST_SHADOW | RECEIVE_SHADOW );
 
-    boatTransform = new osg::MatrixTransform;
+    boatTransform = new osg::PositionAttitudeTransform;
     boatTransform->addChild(boat.get());
 
     scene->getOceanScene()->addChild(boatTransform.get());
@@ -64,14 +65,37 @@ osg::ref_ptr<osg::MatrixTransform> addCylinder(osg::ref_ptr<Scene> &scene, int w
     return boatTransform;
 }
 
-void moveCylinder(osg::ref_ptr<osg::MatrixTransform> &boatTransform, float x, float y, float z)
+void moveASV(osg::ref_ptr<osg::PositionAttitudeTransform> &boatTransform, float x, float y, float z, float yaw, float roll, float pitch)
 {
-	boatTransform->setMatrix(osg::Matrix::translate(osg::Vec3f(
+	boatTransform->setPosition(osg::Vec3f(
 		(x*SPEED)+X_OFFSET,
 		(y*SPEED)+Y_OFFSET,
 		z+Z_OFFSET
-	)));
-	std::cout << (x*SPEED)+X_OFFSET << " " << (y*SPEED)+Y_OFFSET << " " << z+Z_OFFSET << "\n";
+	));
+
+	float offset = 0.01;
+	yaw *= offset;
+	roll *= offset;
+	pitch *= offset;
+
+	osg::Quat quat = osg::Quat(
+		sin(roll) * cos(pitch) * cos(yaw) - cos(roll) * sin(pitch) * sin(yaw),
+	    cos(roll) * sin(pitch) * cos(yaw) + sin(roll) * cos(pitch) * sin(yaw),
+	    cos(roll) * cos(pitch) * sin(yaw) - sin(roll) * sin(pitch) * cos(yaw),
+	    cos(roll) * cos(pitch) * cos(yaw) + sin(roll) * sin(pitch) * sin(yaw)
+	);
+
+	boatTransform->setAttitude(quat);
+	// osg::Matrix mat = osg::Matrix::translate(osg::Vec3f(
+	// 	(x*SPEED)+X_OFFSET,
+	// 	(y*SPEED)+Y_OFFSET,
+	// 	z+Z_OFFSET
+	// ));
+
+	// const double angle = 90;
+	// const osg::Vec3d axis(x, y, z);
+	// boatTransform->setMatrix(mat * osg::Matrix::rotate(angle, axis));
+	// // std::cout << (x*SPEED)+X_OFFSET << " " << (y*SPEED)+Y_OFFSET << " " << z+Z_OFFSET << "\n";
 }
 
 void Api::parse(std::string str, osg::ref_ptr<Scene> &scene) {
@@ -83,13 +107,16 @@ void Api::parse(std::string str, osg::ref_ptr<Scene> &scene) {
 	}
 
 	if (tokens[0] == "CREATE") {
-		asvList[std::stod(tokens[1])] = addCylinder(scene, std::stod(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4]));
+		asvList[std::stod(tokens[1])] = addASV(scene, std::stod(tokens[2]), std::stod(tokens[3]), std::stod(tokens[4]));
 	} else if (tokens[0] == "MOVE") {
-		moveCylinder(
+		moveASV(
 			asvList[std::stod(tokens[1])],
 			std::stod(tokens[2]),
 			std::stod(tokens[3]),
-			std::stod(tokens[4])
+			std::stod(tokens[4]),
+			std::stod(tokens[5]),
+			std::stod(tokens[6]),
+			std::stod(tokens[7])
 		);
 	}
 }

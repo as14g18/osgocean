@@ -38,5 +38,5 @@ class Api
 {
 public:
 	void parse(std::string str, osg::ref_ptr<Scene> &scene);
-	std::unordered_map<int,osg::ref_ptr<osg::MatrixTransform>> asvList;
+	std::unordered_map<int,osg::ref_ptr<osg::PositionAttitudeTransform>> asvList;
 };
